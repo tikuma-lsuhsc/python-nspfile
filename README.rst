@@ -1,7 +1,7 @@
 `nspfile`: Computerized Speech Lab NSP Audio File Reader in Python
 ===================================================
 
-<!-- .. image:: https://img.shields.io/pypi/v/nspfile
+.. image:: https://img.shields.io/pypi/v/nspfile
   :alt: PyPI
 .. image:: https://img.shields.io/pypi/status/nspfile
   :alt: PyPI - Status
@@ -10,15 +10,9 @@
 .. image:: https://img.shields.io/github/license/tikuma-lsuhsc/python-nspfile
   :alt: GitHub
 .. image:: https://img.shields.io/github/workflow/status/tikuma-lsuhsc/python-nspfile/Run%20Tests
-  :alt: GitHub Workflow Status -->
+  :alt: GitHub Workflow Status
 
-Python `nspfile` package implements `scipy.io.wavfile` compatible functions.
-
-
-.. Documentation
-.. -------------
-
-.. Visit our `GitHub page here <https://tikuma-lsuhsc.github.io/python-nspfile/>`__
+Python `nspfile` package implements `scipy.io.wavfile` compatible functions for .nsp sound file format.
 
 Reference
 ---------
