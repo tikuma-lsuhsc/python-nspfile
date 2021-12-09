@@ -1,4 +1,4 @@
-`nspfile`: Computerized Speech Lab NSP Audio File Reader in Python
+`nspfile`: NSP Audio File Reader in Python
 ===================================================
 
 .. image:: https://img.shields.io/pypi/v/nspfile
@@ -12,7 +12,31 @@
 .. image:: https://img.shields.io/github/workflow/status/tikuma-lsuhsc/python-nspfile/Run%20Tests
   :alt: GitHub Workflow Status
 
+NSP audio file format is primarily used for KayPENTAX Computerized Speech Lab (CSL).
+
 Python `nspfile` package implements `scipy.io.wavfile` compatible functions for .nsp sound file format.
+
+Install
+-------
+
+.. code-block:: bash
+
+   pip install nspfile
+
+Use
+---
+
+.. code-block:: bash
+
+   import nspfile
+
+   fs, x = nspfile.read('myvoice.nsp')
+
+TODOs
+-----
+
+- Test multichannel file read
+- Add a writer function
 
 Reference
 ---------
