@@ -1,18 +1,19 @@
-from io import SEEK_CUR
+"""NSP file reader (eventually I/O) module"""
+
 from datetime import datetime
 import numpy as np
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 
 def read(filename, channels=None, return_header=False, return_note=False):
-    """read a NSP file
+    """read an NSP file
 
-    Return the sample rate (in samples/sec) and data from an Pentax Medical CSL NSP audio file.
+    Return the sample rate (in samples/sec) and data from an KayPENTAX CSL NSP audio file.
 
     :param filename: Input NSP file
     :type filename: str
-    :param channels: Specify channels to return ('a','b',0-8, or a sequence thereof), defaults to None
+    :param channels: Specify channels to return ('a', 'b', 0-8, or a sequence thereof), defaults to None
     :type channels: str, int, sequence, optional
     :param return_header: True to return header data, defaults to False
     :type return_header: bool, optional
@@ -21,7 +22,8 @@ def read(filename, channels=None, return_header=False, return_note=False):
     :return:
         - rate   - Sample rate of NSP file.
         - data   - Data read from NSP file. Data is 1-D for 1-channel NSP (only A channel), or 2-D
-                   of shape (Nsamples, Nchannels) otherwise.
+                   of shape (Nsamples, Nchannels) otherwise. If any channel is missing zeros
+                   are returned for that channel. 
         - header - Header data of NSP file with fields: date, rate, length, and max_abs_values
         - note   - Note data of NSP file
     :rtype: (int, numpy.ndarray('i2')[, dict][, str])
@@ -49,7 +51,7 @@ def read(filename, channels=None, return_header=False, return_note=False):
                 np.fromfile(f, "<i2", ssz) if id.startswith("SD") else f.read(ssz)
             )
             if ssz % 2:
-                f.seek(1, SEEK_CUR)
+                f.seek(1, 1)
                 ssz += 1
             n += 8 + ssz
 
@@ -64,8 +66,9 @@ def read(filename, channels=None, return_header=False, return_note=False):
         if cdata[1] is None:
             x = cdata[0]
         else:
-            cdata[0] = np.zeros_like(cdata[1]) if cdata[0] is None else cdata[0]
-            x = np.stack(cdata)
+            z = np.zeros_like(cdata[1]) if cdata[0] is None else None
+            cdata[0] = z if z is None else cdata[0]
+            x = np.stack(cdata, -1)
 
     if "HDR8" in subchunks:
         cdata = [
@@ -73,11 +76,28 @@ def read(filename, channels=None, return_header=False, return_note=False):
             for ch in (f"SD_{ch}" for ch in range(2, 9))
         ]
 
-        if x is None:
-            x = np.zeros_like(next(x for x in cdata if x is not None)).tile(())
+        # truncate unused upper channels
+        nch = next(c for c in range(7, -1, -1) if cdata[c] is not None) + 1
 
-        if x is None:
-            x = np.stack(np.zeros_like(x[:, 0]))
+        if nch > 0:
+            cdata = cdata[:nch]
+
+            # if filler zeros are not defined, create one
+            if z is None:
+                z = np.zeros_like(
+                    next(x for x in cdata if x is not None) if x is None else x[0]
+                )
+
+            y = np.stack([z if x is None else x for x in cdata], -1)
+
+            if x is None:
+                # give A & B channels zeros
+                x = np.tile(z, (1, 2))
+            elif x.ndim == 1:
+                # no B channel, assign zeros to it
+                x = np.stack((x, np.zeros_like), -1)
+
+            x = np.concatenate((x, y), -1)
 
     if x is None:
         raise RuntimeError(f'"{filename}" does not contain any data.')

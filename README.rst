@@ -26,7 +26,7 @@ Install
 Use
 ---
 
-.. code-block:: bash
+.. code-block:: python
 
    import nspfile
 
@@ -35,7 +35,7 @@ Use
 TODOs
 -----
 
-- Test multichannel file read
+- Test multichannel read
 - Add a writer function
 
 Reference
