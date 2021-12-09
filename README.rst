@@ -1,15 +1,17 @@
 `nspfile`: NSP Audio File Reader in Python
 ===================================================
 
-.. image:: https://img.shields.io/pypi/v/nspfile
+|pypi| |status| |pyver| |license| |test_status|
+
+.. |pypi| image:: https://img.shields.io/pypi/v/nspfile
   :alt: PyPI
-.. image:: https://img.shields.io/pypi/status/nspfile
+.. |status| image:: https://img.shields.io/pypi/status/nspfile
   :alt: PyPI - Status
-.. image:: https://img.shields.io/pypi/pyversions/nspfile
+.. |pyver| image:: https://img.shields.io/pypi/pyversions/nspfile
   :alt: PyPI - Python Version
-.. image:: https://img.shields.io/github/license/tikuma-lsuhsc/python-nspfile
+.. |license| image:: https://img.shields.io/github/license/tikuma-lsuhsc/python-nspfile
   :alt: GitHub
-.. image:: https://img.shields.io/github/workflow/status/tikuma-lsuhsc/python-nspfile/Run%20Tests
+.. |test_status| image:: https://img.shields.io/github/workflow/status/tikuma-lsuhsc/python-nspfile/Run%20Tests
   :alt: GitHub Workflow Status
 
 NSP audio file format is primarily used for KayPENTAX Computerized Speech Lab (CSL).
