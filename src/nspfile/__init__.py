@@ -2,6 +2,7 @@
 
 from datetime import datetime
 import numpy as np
+import logging
 
 __version__ = "0.1.1"
 
@@ -23,7 +24,7 @@ def read(filename, channels=None, return_header=False, return_note=False):
         - rate   - Sample rate of NSP file.
         - data   - Data read from NSP file. Data is 1-D for 1-channel NSP (only A channel), or 2-D
                    of shape (Nsamples, Nchannels) otherwise. If any channel is missing zeros
-                   are returned for that channel. 
+                   are returned for that channel.
         - header - Header data of NSP file with fields: date, rate, length, and max_abs_values
         - note   - Note data of NSP file
     :rtype: (int, numpy.ndarray('i2')[, dict][, str])
@@ -48,7 +49,7 @@ def read(filename, channels=None, return_header=False, return_note=False):
                 raise ValueError(f"Specified file contains unknown subchunk: {id}")
             ssz = int.from_bytes(f.read(4), "little", signed=False)
             subchunks[id] = (
-                np.fromfile(f, "<i2", ssz) if id.startswith("SD") else f.read(ssz)
+                np.fromfile(f, "<i2", ssz // 2) if id.startswith("SD") else f.read(ssz)
             )
             if ssz % 2:
                 f.seek(1, 1)
@@ -67,7 +68,7 @@ def read(filename, channels=None, return_header=False, return_note=False):
             x = cdata[0]
         else:
             z = np.zeros_like(cdata[1]) if cdata[0] is None else None
-            cdata[0] = z if z is None else cdata[0]
+            cdata[0] = z if cdata[0] is None else cdata[0]
             x = np.stack(cdata, -1)
 
     if "HDR8" in subchunks:
