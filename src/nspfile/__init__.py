@@ -2,9 +2,8 @@
 
 from datetime import datetime
 import numpy as np
-import logging
 
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 
 
 def read(filename, channels=None, return_header=False, return_note=False):
