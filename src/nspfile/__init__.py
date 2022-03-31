@@ -30,6 +30,12 @@ def read(filename, channels=None, return_header=False, return_note=False):
     :rtype: (int, numpy.ndarray('i2')[, dict][, str])
     """
 
+    # MARKER CHUNKS?
+    # case {'MKA_', 'MKB_', 'MKAB'}
+    # 	block.length = fread(fid, 1, 'uint32');
+    # 	block.pos = fread(fid, 1, 'uint32');
+    # 	block.text = char(fread(fid, [1 ceil((block.length - 4) / 2) * 2], 'char'));
+
     # fmt:off
     subchunk_ids = 'HEDR','HDR8','NOTE','SDA_','SD_B','SDAB','SD_2','SD_3','SD_4','SD_5','SD_6','SD_7','SD_8'
     # fmt:on
@@ -67,8 +73,8 @@ def read(filename, channels=None, return_header=False, return_note=False):
         if cdata[1] is None:
             x = cdata[0]
         else:
-            z = np.zeros_like(cdata[1]) if cdata[0] is None else None
-            cdata[0] = z if cdata[0] is None else cdata[0]
+            if cdata[0] is None:
+                cdata[0] = np.zeros_like(cdata[1])
             x = np.stack(cdata, -1)
 
     if "HDR8" in subchunks:
@@ -117,10 +123,8 @@ def read(filename, channels=None, return_header=False, return_note=False):
                 )
 
         try:
-            if x.ndim > 1:
-                x = x[:, channels]
-            elif any(channels):
-                raise
+            assert x.ndim > 1
+            x = x[:, channels]
         except:
             raise ValueError("invalid channels requested.")
 
