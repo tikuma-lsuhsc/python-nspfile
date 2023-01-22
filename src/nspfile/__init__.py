@@ -61,7 +61,9 @@ def read(filename, channels=None, return_header=False, return_note=False):
                 ssz += 1
             n += 8 + ssz
 
-    data = subchunks["HEDR"] or subchunks["HDR8"]
+    data = subchunks.get("HEDR", None) or subchunks.get("HDR8", None)
+    if data is None:
+        raise RuntimeError(f'"{filename}" is missing the required HEDR/HDR8 subchunk.')
 
     fs = int.from_bytes(data[20:24], "little", signed=False)  # Sampling rate
 
