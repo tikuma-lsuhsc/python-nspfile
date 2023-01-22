@@ -3,7 +3,7 @@
 from datetime import datetime
 import numpy as np
 
-__version__ = "0.1.3"
+__version__ = "0.1.4"
 
 
 def read(filename, channels=None, return_header=False, return_note=False):
