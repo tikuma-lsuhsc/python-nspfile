@@ -9,6 +9,7 @@ from datetime import datetime
 import numpy as np
 
 __version__ = "0.1.4"
+__all__ = ["read", "NSPHeaderDict"]
 
 
 class NSPHeaderDict(TypedDict):
@@ -30,7 +31,8 @@ def read(
     channels: str | int | Sequence[str | int] | None = None,
     return_header: bool = False,
     return_note: bool = False,
-) -> tuple[int, NDArray, NSPHeaderDict | None, str | None]:
+    just_header: bool = False,
+) -> tuple[int, NDArray, NSPHeaderDict | None, str | None] | NSPHeaderDict:
     """read an NSP file
 
     Return the sample rate (in samples/sec) and data from an KayPENTAX CSL NSP audio file.
@@ -39,13 +41,13 @@ def read(
     :param channels: Specify channels to return ('a', 'b', 0-8, or a sequence thereof), defaults to None
     :param return_header: True to return header data, defaults to False
     :param return_note: True to return note, defaults to False
-    :return rate: Sample rate of NSP file.
-    :return data: Data read from NSP file. Data is 1-D for 1-channel NSP (only A channel), or 2-D
+    :return rate: Sample rate of NSP file (if ``just_header=False``).
+    :return data: Data read from NSP file (if ``just_header=False``). Data is 1-D for 1-channel NSP (only A channel), or 2-D
                    of shape (Nsamples, Nchannels) otherwise. If any channel is missing zeros
                    are returned for that channel.
     :return header: Header data of NSP file with fields: date, rate, length, and max_abs_values, only returned
                     if ``return_header=True``.
-    :return note: Attached note of NSP file, only returned if ``return_note=True``.
+    :return note: Attached note of NSP file, only returned if ``return_note=True`` and ``just_header=False``.
     """
 
     # MARKER CHUNKS?
@@ -85,6 +87,23 @@ def read(
         raise RuntimeError(f'"{filename}" is missing the required HEDR/HDR8 subchunk.')
 
     fs = int.from_bytes(data[20:24], "little", signed=False)  # Sampling rate
+
+    if return_header or just_header:
+        header: NSPHeaderDict = {
+            "date": datetime.strptime(
+                data[:20].decode("utf-8"), "%b %d %H:%M:%S %Y"
+            ),  # Date, e.g. May 26 23:57:43 1995
+            "rate": fs,
+            "length": int.from_bytes(
+                data[24:28], "little", signed=False
+            ),  # Data length (bytes)
+            "max_abs_values": np.frombuffer(
+                data[28:], "<u2"
+            ),  # Maximum absolute value for channels
+        }
+
+        if just_header:
+            return header
 
     if "SDAB" in subchunks:
         x = subchunks["SDAB"].reshape(-1, 2)
@@ -151,20 +170,7 @@ def read(
     out = [fs, x]
 
     if return_header:
-        out.append(
-            {
-                "date": datetime.strptime(
-                    data[:20].decode("utf-8"), "%b %d %H:%M:%S %Y"
-                ),  # Date, e.g. May 26 23:57:43 1995
-                "rate": fs,
-                "length": int.from_bytes(
-                    data[24:28], "little", signed=False
-                ),  # Data length (bytes)
-                "max_abs_values": np.frombuffer(
-                    data[28:], "<u2"
-                ),  # Maximum absolute value for channels
-            }
-        )
+        out.append(header)
 
     if return_note:
         out.append(subchunks.get("NOTE", b"").decode("utf-8"))

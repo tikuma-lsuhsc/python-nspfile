@@ -1,4 +1,5 @@
-from nspfile import read
+from nspfile import read, NSPHeaderDict
+
 
 def test():
     testfile = "test/addf8.nsp"
@@ -11,3 +12,9 @@ def test():
 
     # plt.plot(x)
     # plt.show()
+
+
+def test_just_header():
+    testfile = "test/addf8.nsp"
+    hdr = read(testfile, just_header=True)
+    assert set(hdr) == set(NSPHeaderDict.__annotations__)
