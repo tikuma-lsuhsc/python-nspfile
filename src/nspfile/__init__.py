@@ -82,6 +82,10 @@ def read(
                 ssz += 1
             n += 8 + ssz
 
+            if just_header and id in ("HEDR", "HDR8"):
+                # stop reading file if only header info is needed
+                break
+
     data = subchunks.get("HEDR", None) or subchunks.get("HDR8", None)
     if data is None:
         raise RuntimeError(f'"{filename}" is missing the required HEDR/HDR8 subchunk.')
