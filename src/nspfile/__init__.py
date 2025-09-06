@@ -1,32 +1,51 @@
 """NSP file reader (eventually I/O) module"""
 
+from __future__ import annotations
+
+from typing import Sequence, TypedDict
+from numpy.typing import NDArray
+
 from datetime import datetime
 import numpy as np
 
 __version__ = "0.1.4"
 
 
-def read(filename, channels=None, return_header=False, return_note=False):
+class NSPHeaderDict(TypedDict):
+    date: datetime
+    """recording date/time"""
+    rate: int
+    """sampling rate in samples/second
+    """
+    length: int
+    """data length in bytes (data is always in int16)
+    """
+    max_abs_values: NDArray
+    """maximum absolute values of channels
+    """
+
+
+def read(
+    filename: str,
+    channels: str | int | Sequence[str | int] | None = None,
+    return_header: bool = False,
+    return_note: bool = False,
+) -> tuple[int, NDArray, NSPHeaderDict | None, str | None]:
     """read an NSP file
 
     Return the sample rate (in samples/sec) and data from an KayPENTAX CSL NSP audio file.
 
     :param filename: Input NSP file
-    :type filename: str
     :param channels: Specify channels to return ('a', 'b', 0-8, or a sequence thereof), defaults to None
-    :type channels: str, int, sequence, optional
     :param return_header: True to return header data, defaults to False
-    :type return_header: bool, optional
     :param return_note: True to return note, defaults to False
-    :type return_note: bool, optional
-    :return:
-        - rate   - Sample rate of NSP file.
-        - data   - Data read from NSP file. Data is 1-D for 1-channel NSP (only A channel), or 2-D
+    :return rate: Sample rate of NSP file.
+    :return data: Data read from NSP file. Data is 1-D for 1-channel NSP (only A channel), or 2-D
                    of shape (Nsamples, Nchannels) otherwise. If any channel is missing zeros
                    are returned for that channel.
-        - header - Header data of NSP file with fields: date, rate, length, and max_abs_values
-        - note   - Note data of NSP file
-    :rtype: (int, numpy.ndarray('i2')[, dict][, str])
+    :return header: Header data of NSP file with fields: date, rate, length, and max_abs_values, only returned
+                    if ``return_header=True``.
+    :return note: Attached note of NSP file, only returned if ``return_note=True``.
     """
 
     # MARKER CHUNKS?
