@@ -8,7 +8,7 @@ from numpy.typing import NDArray
 from datetime import datetime
 import numpy as np
 
-__version__ = "0.1.4"
+__version__ = "0.2.0"
 __all__ = ["read", "NSPHeaderDict"]
 
 
