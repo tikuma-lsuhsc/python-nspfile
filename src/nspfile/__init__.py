@@ -18,7 +18,7 @@ class NSPHeaderDict(TypedDict):
     """sampling rate in samples/second
     """
     length: int
-    """data length in bytes (data is always in int16)
+    """data length in samples
     """
     max_abs_values: NDArray
     """maximum absolute values of channels
