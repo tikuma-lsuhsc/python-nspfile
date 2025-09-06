@@ -1,3 +1,26 @@
 [build-system]
-requires = ["setuptools >= 40.9.0", "wheel"]
+requires = ["setuptools >= 61.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "nspfile"
+description = "KayPENTAX CSL NSP Audio File Format Reader"
+readme = "README.rst"
+keywords = ["multimedia"]
+license = "GPL-2.0"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Topic :: Multimedia :: Sound/Audio",
+    "Programming Language :: Python :: 3",
+]
+dynamic = ["version"]
+requires-python = ">=3.10"
+dependencies = ["numpy"]
+
+[project.urls]
+Repository = "https://github.com/tikuma-lsuhsc/python-nspfile"
+Issues = "https://github.com/tikuma-lsuhsc/python-nspfile/issues"
+Pull_Requests = "https://github.com/tikuma-lsuhsc/python-nspfile/pulls"
+
+[tool.setuptools.dynamic]
+version = { attr = "nspfile.__version__" }
