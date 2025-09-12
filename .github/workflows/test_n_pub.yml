@@ -35,10 +35,10 @@ jobs:
     steps:
       - run: echo ${{github.ref}}
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v5
 
       - name: Setup Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
           architecture: ${{ matrix.arch }}
@@ -47,9 +47,8 @@ jobs:
         run: |
           python -m pip install -U pip
           pip install -U build pytest pytest-github-actions-annotate-failures 
-          pip install -U numpy
 
-      - name: Install nspfile package
+      - name: Install sbvoicedb package
         run: pip install .
 
       - name: Run tests
@@ -61,10 +60,10 @@ jobs:
     needs: tests
     if: startsWith(github.ref, 'refs/tags')
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v5
 
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v6
         with:
           python-version: "3.x" # Version range or exact version of a Python version to use, using SemVer's version range syntax
 
@@ -77,20 +76,20 @@ jobs:
         run: python -m build --sdist --wheel --outdir dist/ .
 
       - name: add python distribution files to release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: dist/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # - name: Publish distribution 📦 to Test PyPI
-      #   uses: pypa/gh-action-pypi-publish@master
+      #   uses: pypa/gh-action-pypi-publish@release/v1
       #   with:
       #     password: ${{ secrets.TEST_PYPI_API_TOKEN }}
       #     repository_url: https://test.pypi.org/legacy/
       #     skip_existing: true
 
       - name: Publish distribution 📦 to PyPI
-        uses: pypa/gh-action-pypi-publish@master
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+
